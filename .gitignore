@@ -1,0 +1,27 @@
+# Python virtual environment
+.venv/
+
+# VS Code settings
+.vscode/
+
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Raw and processed datasets
+DATA/raw/
+DATA/processed/
+
+# Temporary files
+*.tmp
+*.temp
+
+# Streamlit cache
+.streamlit/
+
+# OS files
+.DS_Store
+Thumbs.db
