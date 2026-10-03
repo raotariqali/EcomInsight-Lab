@@ -762,7 +762,6 @@ def build_dashboard_export(df_export, orders_export, filtered_orders, filtered_i
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 DATA_PATH = PROJECT_ROOT / "DATA" / "processed" / "ecommerce_cleaned.csv"
 if not DATA_PATH.exists():
-    fallback = Path(r"C:\Users\123\OneDrive\Desktop\project\DATA\processed\ecommerce_cleaned.csv")
     if fallback.exists():
         DATA_PATH = fallback
 
@@ -985,7 +984,7 @@ try:
             data=export_png,
             file_name=f"ecommerce_dashboard_full_dashboard.png",
             mime="image/png",
-            use_container_width=True,
+            width='stretch',
             key="download_dashboard_png",
         )
         st.download_button(
@@ -993,7 +992,7 @@ try:
             data=export_pdf,
             file_name=f"ecommerce_dashboard_full_dashboard.pdf",
             mime="application/pdf",
-            use_container_width=True,
+            width='stretch',
             key="download_dashboard_pdf",
         )
 except Exception as export_exc:
@@ -1118,7 +1117,7 @@ if page == "Overview":
                 fill="tozeroy", fillcolor="rgba(76,141,255,.10)", name="Revenue"
             ))
             chart_layout(fig, 365, "Monthly Order Value")
-            st.plotly_chart(fig, use_container_width=True)
+            st.plotly_chart(fig, width='stretch')
         else:
             st.info("No sales data for the selected filters.")
 
@@ -1132,7 +1131,7 @@ if page == "Overview":
             fig = px.bar(cat, x="Product_Revenue", y="category_name_1", orientation="h")
             fig.update_traces(marker_color=CYAN, marker_line_width=0)
             chart_layout(fig, 365, "Top Categories by Product Revenue")
-            st.plotly_chart(fig, use_container_width=True)
+            st.plotly_chart(fig, width='stretch')
 
     section("Business mix", "How orders and value are distributed across the selected filters.", icon="◇", accent=PURPLE)
     a, b, c = st.columns(3)
@@ -1142,19 +1141,19 @@ if page == "Overview":
         fig = px.pie(mix, names="Customer Type", values="Orders", hole=.62)
         fig.update_traces(marker_colors=[BLUE, CYAN], textinfo="percent")
         chart_layout(fig, 310, "Repeat vs One-time Orders")
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width='stretch')
     with b:
         pm = fo.groupby("payment_method")["grand_total"].sum().reset_index().sort_values("grand_total", ascending=False).head(7)
         fig = px.bar(pm, x="payment_method", y="grand_total")
         fig.update_traces(marker_color=TEAL)
         chart_layout(fig, 310, "Payment Channels by Value")
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width='stretch')
     with c:
         refund_mix = pd.DataFrame({"Type": ["Refund", "Non-refund"], "Orders": [refund_orders, order_count-refund_orders]})
         fig = px.pie(refund_mix, names="Type", values="Orders", hole=.62)
         fig.update_traces(marker_colors=[RED, GREEN], textinfo="percent")
         chart_layout(fig, 310, "Refund Exposure")
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width='stretch')
 
     repeat_rev = fo.loc[fo["Customer_Type"] == "Repeat", "grand_total"].sum()
     top_cat_share = safe_div(cat["Product_Revenue"].head(3).sum(), fi["Product_Revenue"].sum()) * 100 if not cat.empty else 0
@@ -1182,12 +1181,12 @@ elif page == "Sales":
         fig = px.line(monthly, x="Month_Label", y="Revenue", markers=True)
         fig.update_traces(line_color=BLUE, marker_color=CYAN, line_width=3)
         chart_layout(fig, 370, "Monthly Revenue Trend")
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width='stretch')
     with b:
         fig = px.bar(monthly, x="Month_Label", y="Orders")
         fig.update_traces(marker_color=PURPLE)
         chart_layout(fig, 370, "Monthly Order Volume")
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width='stretch')
 
     a, b, c = st.columns(3)
     with a:
@@ -1202,7 +1201,7 @@ elif page == "Sales":
     fig = px.histogram(hist, nbins=55)
     fig.update_traces(marker_color=CYAN)
     chart_layout(fig, 350, "Distribution of Order Values")
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width='stretch')
 
 elif page == "Customers":
     section("Customer behavior", "Frequency, revenue contribution and customer-level concentration.", icon="👥", accent=PURPLE)
@@ -1218,13 +1217,13 @@ elif page == "Customers":
         fig = px.pie(mix, names="Customer Type", values="Customers", hole=.60)
         fig.update_traces(marker_colors=[BLUE, CYAN])
         chart_layout(fig, 350, "Customer Type Mix")
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width='stretch')
     with b:
         sample = cust.sample(min(12000, len(cust)), random_state=42) if len(cust) else cust
         fig = px.scatter(sample, x="Orders", y="Revenue", log_x=True, log_y=True, opacity=.55)
         fig.update_traces(marker_color=ORANGE, marker_size=6)
         chart_layout(fig, 350, "Orders vs Customer Revenue")
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width='stretch')
 
     bins = [-1, 1, 2, 5, 10, np.inf]
     labels = ["1 order", "2 orders", "3–5 orders", "6–10 orders", "11+ orders"]
@@ -1233,11 +1232,11 @@ elif page == "Customers":
     fig = px.bar(freq, x="Frequency", y="Customers")
     fig.update_traces(marker_color=TEAL)
     chart_layout(fig, 335, "Customer Purchase Frequency")
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width='stretch')
 
     st.markdown("#### 🏆 Highest-value customers")
     top = cust.nlargest(10, "Revenue").sort_values("Revenue", ascending=False)
-    st.dataframe(top, use_container_width=True, hide_index=True)
+    st.dataframe(top, width='stretch', hide_index=True)
 
 elif page == "Products":
     section("Products & SKUs", "Product-level revenue, demand and pricing patterns.", icon="📦", accent=AMBER)
@@ -1252,12 +1251,12 @@ elif page == "Products":
         fig = px.bar(top_sku.head(10), x="Revenue", y="sku", orientation="h")
         fig.update_traces(marker_color=BLUE)
         chart_layout(fig, 410, "Top 10 SKUs by Product Revenue")
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width='stretch')
     with b:
         fig = px.bar(cat.head(10), x="Product_Revenue", y="category_name_1", orientation="h")
         fig.update_traces(marker_color=AMBER)
         chart_layout(fig, 410, "Category Product Revenue")
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width='stretch')
 
     a, b = st.columns(2)
     with a:
@@ -1265,12 +1264,12 @@ elif page == "Products":
         fig = px.scatter(sample, x="qty_ordered", y="price", size="Product_Revenue", opacity=.45)
         fig.update_traces(marker_color=CYAN)
         chart_layout(fig, 360, "Quantity vs Price")
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width='stretch')
     with b:
         fig = px.histogram(prod, x="price", nbins=55)
         fig.update_traces(marker_color=PURPLE)
         chart_layout(fig, 360, "Product Price Distribution")
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width='stretch')
 
 elif page == "Refunds":
     section("Refund & returns risk", "Refund exposure at order level and its movement across categories and time.", icon="↩", accent=RED)
@@ -1292,13 +1291,13 @@ elif page == "Refunds":
         fig = px.line(monthly, x="Month_Label", y="Refund Rate", markers=True)
         fig.update_traces(line_color=RED, marker_color=ORANGE, line_width=3)
         chart_layout(fig, 370, "Monthly Refund Rate")
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width='stretch')
     with b:
         comp = pd.DataFrame({"Type": ["Refund Orders", "Non-Refund Orders"], "Orders": [len(refund), len(nonrefund)]})
         fig = px.pie(comp, names="Type", values="Orders", hole=.58)
         fig.update_traces(marker_colors=[RED, GREEN])
         chart_layout(fig, 370, "Refund vs Non-Refund Orders")
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width='stretch')
 
     refund_ids = set(refund["increment_id"])
     rc = fi.assign(Is_Refund=fi["increment_id"].isin(refund_ids)).groupby("category_name_1").agg(
@@ -1309,7 +1308,7 @@ elif page == "Refunds":
     fig = px.bar(rc, x="Refund Rate", y="category_name_1", orientation="h")
     fig.update_traces(marker_color=RED)
     chart_layout(fig, 390, "Category Refund Rate")
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width='stretch')
 
 elif page == "Payments":
     section("Payment channel performance", "Order volume, revenue contribution and average order value by payment method.", icon="💳", accent=CYAN)
@@ -1324,20 +1323,20 @@ elif page == "Payments":
         fig = px.bar(pm.head(10), x="payment_method", y="Orders")
         fig.update_traces(marker_color=BLUE)
         chart_layout(fig, 380, "Payment Methods by Order Count")
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width='stretch')
     with b:
         fig = px.bar(pm.head(10), x="payment_method", y="Revenue")
         fig.update_traces(marker_color=TEAL)
         chart_layout(fig, 380, "Payment Methods by Revenue")
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width='stretch')
 
     fig = px.scatter(pm, x="Orders", y="AOV", size="Revenue", text="payment_method")
     fig.update_traces(marker_color=AMBER, textposition="top center")
     chart_layout(fig, 390, "Payment Volume vs Average Order Value")
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width='stretch')
 
     st.markdown("#### 💳 Payment method detail")
-    st.dataframe(pm.sort_values("Revenue", ascending=False), use_container_width=True, hide_index=True)
+    st.dataframe(pm.sort_values("Revenue", ascending=False), width='stretch', hide_index=True)
 
 # ------------------------------------------------------------
 # Footer
@@ -1352,3 +1351,5 @@ st.markdown(
     f'<span style="color:#F4C86A;font-weight:800;">Executive Analytics Suite</span> — built with Python, Pandas, Plotly &amp; Streamlit</div>',
     unsafe_allow_html=True,
 )
+
+
